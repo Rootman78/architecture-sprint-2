@@ -1,3 +1,4 @@
+name: mongo-sharding
 services:
   #mongodb1:
   #  container_name: mongodb1
@@ -12,7 +13,7 @@ services:
       - "27017:27017"
     networks:
       app-network:
-        ipv4_address: 173.17.0.10
+        ipv4_address: 173.17.0.100
     volumes:
       - config-data:/data/db
     command:
@@ -38,7 +39,7 @@ services:
       - "27018:27018"
     networks:
       app-network:
-        ipv4_address: 173.17.0.9
+        ipv4_address: 173.17.0.90
     volumes:
       - shard1-data:/data/db
     command:
@@ -64,7 +65,7 @@ services:
       - "27019:27019"
     networks:
       app-network:
-        ipv4_address: 173.17.0.8
+        ipv4_address: 173.17.0.80
     volumes:
       - shard2-data:/data/db
     command:
@@ -90,7 +91,7 @@ services:
       - "27020:27020"
     networks:
       app-network:
-        ipv4_address: 173.17.0.7
+        ipv4_address: 173.17.0.70
     command:
       [
         "mongos", #обычная mongo в режиме роутера
@@ -114,16 +115,17 @@ services:
       context: api_app
       dockerfile: Dockerfile
     image: kazhem/pymongo_api:1.0.0
-  # depends_on:
-     # - shard1
-     # - shard2
-
+    depends_on:
+      - mongos_router
     ports:
       - 8080:8080
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.60 
 
     environment:
       #MONGODB_URL: "mongodb://mongodb1"
-      MONGODB_URL: "mongodb://mongos_router"      
+      MONGODB_URL: "mongodb://mongos_router:27020/somedb"      
       MONGODB_DATABASE_NAME: "somedb"
       
 networks:
